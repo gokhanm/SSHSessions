@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""sshsessions.py - Terminator Plugin to See SSH Connection on terminals"""
+"""sshsessions.py - Terminator Plugin to See SSH Connections on terminal"""
 
 import os
 import gtk
