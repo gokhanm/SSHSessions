@@ -118,7 +118,7 @@ class SSHSessions(plugin.MenuItem):
     def action(self, w, data=None):
 
         if "ON" == self.checkbox_action:
-            command = 'ssh-copy-id %s \n ssh %s \n' % (data['command'], data['command'])
+            command = 'ssh-copy-id -i %s > /dev/null 2>&1 \n ssh %s \n' % (data['command'], data['command'])
         else:
             command = 'ssh %s \n' % data['command']
         
@@ -161,8 +161,7 @@ class SSHSessions(plugin.MenuItem):
             ##{'terminal' : terminal, 'command' : command['command']
             #radio1.connect("clicked", self.action, {'terminal': terminal, 'command': self.return_item(0)})
 
-            #for i in range(1, total_session):
-            for i in range(0, total_session):
+            for i in range(total_session):
                 radio = gtk.RadioButton(None, self.return_item(i))
                 self.mainbox.pack_start(radio, expand=False)
                 radio.connect("clicked", self.action, {'terminal': terminal, 'command': self.return_item(i)})
