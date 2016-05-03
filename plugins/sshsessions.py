@@ -88,16 +88,18 @@ class Proc(object):
 
                 ssh_sessions_list.append(line)
 
-        return ssh_sessions_list
+        return list(set(ssh_sessions_list))
 
 class SSHSessions(plugin.MenuItem):
 
     def __init__(self):
         plugin.MenuItem.__init__(self)
         self.window = gtk.Window()
-        self.window.set_size_request(360, -1)
+        self.window.set_size_request(500, -1)
         self.window.set_title("Opened SSH Sessions")
         self.window.connect("destroy", self.destroy)
+
+        self.checkbox_action = "OFF"
 
         self.proc = Proc()
 
@@ -114,9 +116,19 @@ class SSHSessions(plugin.MenuItem):
         return str(self.proc.ssh_sessions[item])
 
     def action(self, w, data=None):
-        command = 'ssh %s \n' % data['command']
+
+        if "ON" == self.checkbox_action:
+            command = 'ssh-copy-id %s \n ssh %s \n' % (data['command'], data['command'])
+        else:
+            command = 'ssh %s \n' % data['command']
+        
         data['terminal'].vte.feed_child(command)
         self.window.hide()
+
+    def check_box(self, w, data=None):
+         self.checkbox_action = "%s" % ("OFF", "ON")[w.get_active()]
+         
+         return self.checkbox_action
 
     def ssh_sessions(self, _widget, terminal):
 
@@ -137,6 +149,11 @@ class SSHSessions(plugin.MenuItem):
             label.set_alignment(0,0)
             self.mainbox.pack_start(label, padding=10)
             label.show()
+
+            check_button = gtk.CheckButton("Copy SSH Keygen to Server?")
+            check_button.connect("clicked", self.check_box, "")
+            self.mainbox.pack_end(check_button, expand=False)
+            check_button.show()
 
             #radio1 = gtk.RadioButton(None, self.return_item(0))
             #self.mainbox.pack_start(radio1, expand=False)
@@ -183,7 +200,7 @@ class SSHSessions(plugin.MenuItem):
             # self.mainbox.add(hbox_open)
             self.mainbox.add(hbox_close)
 
-            button_close.grab_default()            
+            #button_close.grab_default()            
             
             self.mainbox.show()
 
