@@ -54,13 +54,13 @@ class Proc(object):
 
         proc_list = []
         sub_proc = Popen(['ps', 'aux'], shell=False, stdout=PIPE)
-        #Discard the first line (ps aux header)
+        # Discard the first line (ps aux header)
         sub_proc.stdout.readline()
 
         for line in sub_proc.stdout:
-            #The separator for splitting is 'variable number of spaces'
+            # The separator for splitting is 'variable number of spaces'
             proc_info = split(" *", line.strip())
-            proc_list.append(Proc().to_dict(proc_info))
+            proc_list.append(self.to_dict(proc_info))
     
         return proc_list
     
@@ -88,16 +88,13 @@ class Proc(object):
 
                 ssh_sessions_list.append(line)
 
+        dbg("Sessions List: %s" % list(set(ssh_sessions_list)))
         return list(set(ssh_sessions_list))
 
 class SSHSessions(plugin.MenuItem):
 
     def __init__(self):
         plugin.MenuItem.__init__(self)
-        self.window = gtk.Window()
-        self.window.set_size_request(500, -1)
-        self.window.set_title("Opened SSH Sessions")
-        self.window.connect("destroy", self.destroy)
 
         self.checkbox_action = "OFF"
 
@@ -118,12 +115,12 @@ class SSHSessions(plugin.MenuItem):
     def action(self, w, data=None):
 
         if "ON" == self.checkbox_action:
-            command = 'ssh-copy-id -i %s > /dev/null 2>&1 \n ssh %s \n' % (data['command'], data['command'])
+            command = 'ssh-copy-id -i %s > /dev/null 2>&1 && ssh %s \n' % (data['command'], data['command'])
         else:
             command = 'ssh %s \n' % data['command']
         
         data['terminal'].vte.feed_child(command)
-        self.window.hide()
+        window.hide()
 
     def check_box(self, w, data=None):
          self.checkbox_action = "%s" % ("OFF", "ON")[w.get_active()]
@@ -131,6 +128,12 @@ class SSHSessions(plugin.MenuItem):
          return self.checkbox_action
 
     def ssh_sessions(self, _widget, terminal):
+        global window
+
+        window = gtk.Window()
+        window.set_size_request(500, -1)
+        window.set_title("Opened SSH Sessions")
+        window.connect("destroy", self.destroy)
 
         total_session = len(self.proc.ssh_sessions)
 
@@ -141,9 +144,7 @@ class SSHSessions(plugin.MenuItem):
             message.destroy()
 
         else:
-            self.window.show_all()
             self.mainbox = gtk.VBox()
-            self.window.add(self.mainbox)
 
             label = gtk.Label("Select Opened SSH Sessions")
             label.set_alignment(0,0)
@@ -177,6 +178,7 @@ class SSHSessions(plugin.MenuItem):
 
             radio = gtk.VBox(False, 10)
             self.mainbox.set_border_width(10)
+            radio.show()
 
             # hbox_open = gtk.HBox(False, 0)
 
@@ -189,17 +191,15 @@ class SSHSessions(plugin.MenuItem):
             hbox_close = gtk.HBox(False, 0)
 
             button_close = gtk.Button(stock=gtk.STOCK_CLOSE)
-            button_close.connect("clicked", lambda w: self.window.hide())
-            # button_close.set_flags(gtk.CAN_DEFAULT)
+            button_close.connect("clicked", lambda w: window.hide())
+            button_close.set_flags(gtk.CAN_DEFAULT)
             hbox_close.pack_end(button_close, False, False, 0)
             button_close.show()
 
             # hbox_open.show()
             hbox_close.show()
-            # self.mainbox.add(hbox_open)
             self.mainbox.add(hbox_close)
-
-            #button_close.grab_default()            
+            window.add(self.mainbox)
             
-            self.mainbox.show()
+            window.show_all()
 
