@@ -146,7 +146,7 @@ class SSHSessions(plugin.MenuItem):
         else:
             self.mainbox = gtk.VBox()
 
-            label = gtk.Label("Select Opened SSH Sessions")
+            label = gtk.Label("Select the opened ssh session:")
             label.set_alignment(0,0)
             self.mainbox.pack_start(label, padding=10)
             label.show()
