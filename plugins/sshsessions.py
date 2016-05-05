@@ -107,12 +107,22 @@ class SSHSessions(plugin.MenuItem):
         menuitems.append(item)
 
     def destroy(self, w):
+        """
+            For close button.
+        """
         gtk.main_quit()
 
     def return_item(self, item):
+        """
+            Ssh Connections List
+            return: list
+        """
         return str(self.proc.ssh_sessions[item])
 
     def action(self, w, data=None):
+        """
+            Running after choosing ssh connnection
+        """
 
         if "ON" == self.checkbox_action:
             command = 'ssh-copy-id -i %s > /dev/null 2>&1 && ssh %s \n' % (data['command'], data['command'])
@@ -123,11 +133,19 @@ class SSHSessions(plugin.MenuItem):
         window.hide()
 
     def check_box(self, w, data=None):
+        """
+            If you click the check box return ON. If you unclick the check box return OFF.
+            return: str. "OFF" or "ON"
+        """
+
          self.checkbox_action = "%s" % ("OFF", "ON")[w.get_active()]
          
          return self.checkbox_action
 
     def ssh_sessions(self, _widget, terminal):
+        """
+            Main Process. Preparing all buttons and window
+        """
         global window
 
         window = gtk.Window()
