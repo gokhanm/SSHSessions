@@ -149,6 +149,7 @@ class SSHSessions(plugin.MenuItem):
         global window
 
         window = gtk.Window()
+        window.set_decorated(False)
         window.set_size_request(500, -1)
         window.set_title("Opened SSH Sessions")
         window.connect("destroy", self.destroy)
