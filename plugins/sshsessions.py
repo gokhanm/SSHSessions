@@ -18,12 +18,12 @@ __email__ = "gokhan@mankara.org"
 # Every plugin you want Terminator to load *must* be listed in 'AVAILABLE'
 AVAILABLE = ['SSHSessions']
 
+
 class Proc(object):
     """
         Data structure for a processes . The class properties are
         process attributes
     """
-
     def __init__(self):
         pass
 
@@ -32,15 +32,12 @@ class Proc(object):
             Returns a dict containing minimalistic info
             about the process : pid and command
         """
-
         pid = proc_info[1]
         cmd = proc_info[10]
-
         proc_dict = {
                       "pid": pid,
                       "name": cmd
                     }
- 
         
         return proc_dict
 
@@ -51,7 +48,6 @@ class Proc(object):
             process list list
 
         """
-
         proc_list = []
         sub_proc = Popen(['ps', 'aux'], shell=False, stdout=PIPE)
         # Discard the first line (ps aux header)
@@ -70,16 +66,12 @@ class Proc(object):
             SSH Connections List
             return: list
         """
-
         ssh_sessions_list = []
-
         proc_list = self.get_proc_list
        
         for proc in proc_list:
-
             if 'ssh' == proc['name']:
                 pid = proc['pid']
-           
                 pid_cmdfile = '/proc/%s/cmdline' % pid
 
                 with open(pid_cmdfile, 'r') as f:
@@ -92,12 +84,9 @@ class Proc(object):
         return list(set(ssh_sessions_list))
 
 class SSHSessions(plugin.MenuItem):
-
     def __init__(self):
         plugin.MenuItem.__init__(self)
-
         self.checkbox_action = "OFF"
-
         self.proc = Proc()
 
     def callback(self, menuitems, menu, terminal):
@@ -123,7 +112,6 @@ class SSHSessions(plugin.MenuItem):
         """
             Running after choosing ssh connnection
         """
-
         if "ON" == self.checkbox_action:
             command = 'ssh-copy-id -i %s > /dev/null 2>&1 && ssh %s \n' % (data['command'], data['command'])
         else:
@@ -137,9 +125,7 @@ class SSHSessions(plugin.MenuItem):
             If you click the check box return ON. If you unclick the check box return OFF.
             return: str. "OFF" or "ON"
         """
-
          self.checkbox_action = "%s" % ("OFF", "ON")[w.get_active()]
-         
          return self.checkbox_action
 
     def ssh_sessions(self, _widget, terminal):
@@ -153,7 +139,6 @@ class SSHSessions(plugin.MenuItem):
         window.set_size_request(500, -1)
         window.set_title("Opened SSH Sessions")
         window.connect("destroy", self.destroy)
-
         total_session = len(self.proc.ssh_sessions)
 
         if total_session == 0:
@@ -161,10 +146,8 @@ class SSHSessions(plugin.MenuItem):
             message.set_markup("NO SSH Connection FOUND")
             message.run()
             message.destroy()
-
         else:
             self.mainbox = gtk.VBox()
-
             label = gtk.Label("Select the opened ssh session:")
             label.set_alignment(0,0)
             self.mainbox.pack_start(label, padding=10)
